@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-20 sm:py-24">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6">About Me</h1>
+      <p class="text-lg text-slate-700 dark:text-slate-300 mb-8">
+        Hi, I'm <span class="font-semibold">Himanshu Vishwakarma</span>. I built SynChat to make quick, private conversations effortless — no logins, no friction. It's perfect for interviews, quick support, and ephemeral brainstorming.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <h2 class="text-xl font-bold mb-2">Contact</h2>
+          <ul class="space-y-2 text-slate-700 dark:text-slate-300">
+            <li>Email: <a href="hvishwakarma003@gmail.com" class="text-primary hover:underline">hvishwakarma003@gmail.com</a></li>
+            <li>Location: Mumbai, Country</li>
+            <li>Open to: Collaboration, Freelance, Consulting</li>
+          </ul>
+        </div>
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <h2 class="text-xl font-bold mb-2">Links</h2>
+          <ul class="space-y-2">
+            <li><a href="https://github.com/Himanshu-Vishwakarma-GH" class="text-primary hover:underline">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/in/himanshu-vishwakarma-7516411b6/" class="text-primary hover:underline">LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-3">About SynChat</h2>
+        <p class="text-slate-700 dark:text-slate-300 mb-4">SynChat is a session-based chat with a 30-minute auto-expiry. Share the link, chat in real-time, and everything is cleaned up automatically at the end.</p>
+        <a href="{{ url_for('create_room') }}" class="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2 text-white font-semibold hover:bg-primary/90">Start a Session</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+

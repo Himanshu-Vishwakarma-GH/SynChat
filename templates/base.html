@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SynChat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?display=swap&family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">tailwind.config = {darkMode: 'class', theme: {extend: {colors: {primary: '#359EFF', 'background-light': '#f5f7f8', 'background-dark': '#0f1923'}, fontFamily: {display: 'Manrope'}, borderRadius: {DEFAULT: '0.25rem', lg: '0.5rem', xl: '0.75rem', full: '9999px'}}}};</script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Manrope', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.show { opacity: 1; transform: none; }
+    .faq-item>div { display: none; }
+    .faq-item.open>div { display: block; }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200 flex flex-col min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800/80 backdrop-blur border-b border-primary/20 dark:border-primary/30">
+    <div class="flex items-center gap-3">
+      <div class="size-8 text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+          <path d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 35.9988 39.5563 34.1455Z" fill="currentColor" />
+          <path d="M24 6.44366C28.4582 6.44366 32.5797 7.06909 35.657 8.13948C37.1863 8.67141 38.5667 9.3505 39.6042 10.2036C40.6278 11.0454 41.5563 12.2684 41.5563 13.8546V34.1455C41.5563 36.1078 40.158 37.5042 38.7915 38.3869C37.3498 39.3182 35.4192 40.0389 33.2571 40.5551C30.5836 41.1934 27.3973 41.5564 24 41.5564C20.6027 41.5564 17.4164 41.1934 14.7429 40.5551C12.5808 40.0389 10.6502 39.3182 9.20848 38.3869C7.84205 37.5042 6.44365 36.1078 6.44365 34.1455L6.44365 13.8546C6.44365 12.2684 7.37223 11.0454 8.39581 10.2036C9.43325 9.3505 10.8137 8.67141 12.343 8.13948C15.4203 7.06909 19.5418 6.44366 24 6.44366Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span class="text-xl font-bold text-slate-900 dark:text-white">SynChat</span>
+    </div>
+    <div class="hidden md:flex space-x-6">
+      <a href="{{ url_for('index') }}" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Home</a>
+      <a href="{{ url_for('about') }}" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">About</a>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button id="theme-toggle" aria-label="Toggle theme" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+        <span id="theme-icon">🌙</span>
+      </button>
+      {% if room_id %}
+      <span id="session-timer" class="text-sm text-slate-600 dark:text-slate-300"></span>
+      <a id="exit-button" href="{{ url_for('index') }}" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600">Exit</a>
+      {% else %}
+      <a href="{{ url_for('create_room') }}" class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90">
+        Create Session
+      </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-100 dark:bg-gray-800 text-center py-6 mt-12 text-sm text-gray-600 dark:text-gray-300">
+    <div class="flex justify-center space-x-6 mb-2">
+      <a href="#">Terms of Service</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Contact Us</a>
+    </div>
+    <p>© 2024 SynChat. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Theme init (persisted and respects OS)
+    (function initTheme() {
+      try {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldDark = stored ? stored === 'dark' : prefersDark;
+        document.documentElement.classList.toggle('dark', shouldDark);
+        const icon = document.getElementById('theme-icon');
+        if (icon) icon.textContent = shouldDark ? '☀️' : '🌙';
+      } catch(e) {}
+    })();
+
+    // Theme toggle
+    const themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
+        const icon = document.getElementById('theme-icon');
+        if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+      });
+    }
+
+    // Simple reveal on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // FAQ toggle (for pages that include FAQ)
+    window.toggleFaq = function(element) {
+      element.classList.toggle('open');
+      const icon = element.querySelector('.material-symbols-outlined');
+      if (icon) icon.classList.toggle('rotate-180');
+    }
+  </script>
+</body>
+</html>

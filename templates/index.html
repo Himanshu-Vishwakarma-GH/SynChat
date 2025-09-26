@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-20 sm:py-24 lg:py-32">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-6xl">Secure, Ephemeral, Real-time Chat</h1>
+      <p class="mt-6 text-lg text-slate-600 dark:text-slate-400">Create temporary, private chat sessions instantly. Share a link and start chatting. No accounts, no history, just simple, secure communication.</p>
+      <div class="mt-10">
+        <a href="{{ url_for('create_room') }}" class="flex h-12 items-center justify-center mx-auto overflow-hidden rounded-lg bg-primary px-8 text-base font-bold text-white transition-all hover:bg-primary/90">Start a Session</a>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section id="features" class="py-20 sm:py-24 bg-background-light dark:bg-background-dark">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">Why SynChat?</h2>
+        <p class="mt-4 text-lg text-slate-600 dark:text-slate-400">The simplest way to have a private conversation online.</p>
+      </div>
+      <div class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 text-primary">
+            <span class="material-symbols-outlined">lock</span>
+          </div>
+          <h3 class="mt-6 text-xl font-bold text-slate-900 dark:text-white">Session-based Privacy</h3>
+          <p class="mt-2 text-slate-600 dark:text-slate-400">Each chat has a unique link and auto-expires after 30 minutes. No accounts, no history.</p>
+        </div>
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 text-primary">
+            <span class="material-symbols-outlined">chat</span>
+          </div>
+          <h3 class="mt-6 text-xl font-bold text-slate-900 dark:text-white">Real-time Messaging</h3>
+          <p class="mt-2 text-slate-600 dark:text-slate-400">Powered by WebSockets for instant, low-latency communication between participants.</p>
+        </div>
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 text-primary">
+            <span class="material-symbols-outlined">bolt</span>
+          </div>
+          <h3 class="mt-6 text-xl font-bold text-slate-900 dark:text-white">One-click Start</h3>
+          <p class="mt-2 text-slate-600 dark:text-slate-400">Start a session with a single click and share the link. No setup needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="py-20 sm:py-24">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">How it works</h2>
+        <p class="mt-4 text-lg text-slate-600 dark:text-slate-400">Get started in three simple steps.</p>
+      </div>
+      <div class="mt-16 relative">
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-full bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+        <div class="grid grid-cols-1 gap-12 md:grid-cols-3 relative">
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary text-white text-2xl font-bold border-4 border-background-light dark:border-background-dark">1</div>
+            <h3 class="mt-6 text-xl font-bold text-slate-900 dark:text-white">Create a session</h3>
+            <p class="mt-2 text-slate-600 dark:text-slate-400">Click the "Start a Session" button to instantly generate a new, unique chat room.</p>
+          </div>
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary text-white text-2xl font-bold border-4 border-background-light dark:border-background-dark">2</div>
+            <h3 class="mt-6 text-xl font-bold text-slate-900 dark:text-white">Share the link</h3>
+            <p class="mt-2 text-slate-600 dark:text-slate-400">Copy the unique session link and share it with the person or people you want to chat with.</p>
+          </div>
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary text-white text-2xl font-bold border-4 border-background-light dark:border-background-dark">3</div>
+            <h3 class="mt-6 text-xl font-bold text-slate-900 dark:text-white">Chat and wrap up</h3>
+            <p class="mt-2 text-slate-600 dark:text-slate-400">Chat freely. When you're done, simply close the window. The session ends and the chat is deleted.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="py-20 sm:py-24 bg-background-light dark:bg-background-dark">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto">
+        <div class="text-center">
+          <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">Frequently Asked Questions</h2>
+        </div>
+        <div class="mt-12 space-y-4">
+          <div class="faq-item border border-slate-200 dark:border-slate-700 rounded-lg">
+            <button class="w-full flex justify-between items-center text-left p-4 focus:outline-none" onclick="toggleFaq(this.parentElement)">
+              <span class="text-lg font-medium text-slate-900 dark:text-white">Do I need an account?</span>
+              <span class="material-symbols-outlined transform transition-transform">expand_more</span>
+            </button>
+            <div class="p-4 pt-0 text-slate-600 dark:text-slate-400">No, you do not need an account to use SynChat. All chats are session-based and anonymous. Just create a session and share the link.</div>
+          </div>
+          <div class="faq-item border border-slate-200 dark:border-slate-700 rounded-lg">
+            <button class="w-full flex justify-between items-center text-left p-4 focus:outline-none" onclick="toggleFaq(this.parentElement)">
+              <span class="text-lg font-medium text-slate-900 dark:text-white">How long does a session last?</span>
+              <span class="material-symbols-outlined transform transition-transform">expand_more</span>
+            </button>
+            <div class="p-4 pt-0 text-slate-600 dark:text-slate-400">A session lasts 30 minutes. When the timer ends, the room and its messages are deleted.</div>
+          </div>
+          <div class="faq-item border border-slate-200 dark:border-slate-700 rounded-lg">
+            <button class="w-full flex justify-between items-center text-left p-4 focus:outline-none" onclick="toggleFaq(this.parentElement)">
+              <span class="text-lg font-medium text-slate-900 dark:text-white">Can I end a session early?</span>
+              <span class="material-symbols-outlined transform transition-transform">expand_more</span>
+            </button>
+            <div class="p-4 pt-0 text-slate-600 dark:text-slate-400">You can exit anytime. The session auto-cleans when the timer hits zero.</div>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+{% endblock %}

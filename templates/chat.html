@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 shadow-xl rounded-xl reveal">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-bold">Chat Room: {{ room_id }}</h2>
+    <div class="flex items-center space-x-2">
+      <button id="copy-link-btn" class="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 text-sm font-medium">
+        <span class="material-symbols-outlined text-sm">content_copy</span>
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <div id="chat-box" class="h-[60vh] border rounded-lg p-4 mb-6 overflow-y-auto bg-gray-50 dark:bg-gray-700"></div>
+
+  <form id="chat-form" class="flex space-x-3 items-center">
+    <input type="text" id="message" placeholder="Type your message..." class="flex-1 border rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+    <label for="file-input" class="px-3 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg cursor-pointer flex items-center gap-1">
+      <span class="material-symbols-outlined text-base">attach_file</span>
+      <span class="text-sm">File</span>
+    </label>
+    <input id="file-input" type="file" accept="image/*,.pdf,.txt" class="hidden" />
+    <button type="submit" class="px-5 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">Send</button>
+  </form>
+</div>
+
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  const socket = io();
+  const room_id = "{{ room_id }}";
+  const expiryMs = {{ expiry_ms | tojson }};
+  const serverNowMs = {{ server_now_ms | tojson }};
+  const clientNowAtLoad = Date.now();
+  const serverClientOffsetMs = serverNowMs - clientNowAtLoad; // positive means server is ahead
+  const username = prompt("Enter your name:") || "Anonymous";
+
+  const chatBox = document.getElementById("chat-box");
+  const chatForm = document.getElementById("chat-form");
+  const messageInput = document.getElementById("message");
+
+  // Join room and announce username
+  socket.emit("join", { room: room_id, username: username });
+
+  // Status messages (join/leave)
+  socket.on("status", (data) => {
+    const p = document.createElement("p");
+    p.className = "mb-2 text-xs text-gray-500";
+    p.textContent = data.msg;
+    chatBox.appendChild(p);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+  // Receive chat messages
+  socket.on("receive_message", (data) => {
+    if (data.type === 'image') {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mb-2';
+      const label = document.createElement('div');
+      label.className = 'text-xs text-gray-600 mb-1';
+      label.textContent = `${data.username} sent an image`;
+      const img = document.createElement('img');
+      img.src = data.url;
+      img.alt = 'shared image';
+      img.className = 'max-w-full rounded-lg shadow';
+      wrapper.appendChild(label);
+      wrapper.appendChild(img);
+      chatBox.appendChild(wrapper);
+    } else if (data.type === 'audio') {
+      // audio feature removed
+    } else if (data.type === 'file') {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mb-2 bg-gray-200 px-3 py-2 rounded-lg text-sm text-gray-800';
+      const a = document.createElement('a');
+      a.href = data.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'text-blue-700 underline';
+      a.textContent = `${data.username} shared: ${data.filename || 'file'}`;
+      wrapper.appendChild(a);
+      chatBox.appendChild(wrapper);
+    } else {
+      const p = document.createElement("p");
+      p.className = "mb-2 bg-gray-200 px-3 py-2 rounded-lg text-sm text-gray-800";
+      p.textContent = `${data.username}: ${data.msg}`;
+      chatBox.appendChild(p);
+    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+  // Send message
+  chatForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const msg = messageInput.value;
+    if (msg.trim()) {
+      socket.emit("send_message", { room: room_id, username: username, msg: msg });
+      messageInput.value = "";
+    }
+  });
+
+  // File upload (images, audio, docs)
+  const fileInput = document.getElementById('file-input');
+  if (fileInput) {
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image too large. Max 5MB.');
+        fileInput.value = '';
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const res = await fetch(`/api/rooms/${room_id}/upload`, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Upload failed');
+        // Broadcast according to type
+        socket.emit('send_message', { room: room_id, username: username, msg: '', type: data.type, url: data.url, filename: data.filename });
+      } catch (err) {
+        alert('Failed to upload file');
+      } finally {
+        fileInput.value = '';
+      }
+    });
+  }
+
+  // (audio feature removed)
+
+  // Countdown timer and auto-expiry
+  const timerEl = document.getElementById("session-timer");
+  function updateTimer() {
+    const now = Date.now() + serverClientOffsetMs;
+    const remaining = expiryMs - now;
+    if (remaining <= 0) {
+      timerEl && (timerEl.textContent = "Expired");
+      // Cleanup on server then redirect
+      fetch(`/api/rooms/${room_id}`, { method: 'DELETE' })
+        .finally(() => {
+          socket.emit("leave", { room: room_id, username });
+          window.location.href = "{{ url_for('index') }}";
+        });
+      return true;
+    }
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+    if (timerEl) {
+      timerEl.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    }
+    return false;
+  }
+
+  // Initialize and tick every second
+  if (!updateTimer()) {
+    const intervalId = setInterval(() => {
+      if (updateTimer()) {
+        clearInterval(intervalId);
+      }
+    }, 1000);
+  }
+
+  // Copy link functionality
+  const copyBtn = document.getElementById('copy-link-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const sessionUrl = window.location.href;
+      try {
+        await navigator.clipboard.writeText(sessionUrl);
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Copied!';
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+        }, 2000);
+      } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = sessionUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Copied!';
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+        }, 2000);
+      }
+    });
+  }
+
+</script>
+{% endblock %}
