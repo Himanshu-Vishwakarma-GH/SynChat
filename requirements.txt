@@ -7,5 +7,3 @@ uuid==1.30
 datetime==5.1
 SQLAlchemy==2.0.20
 
-
-SocketIO==4.6.1
